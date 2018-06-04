@@ -12,7 +12,7 @@ def probe(adapter, address):
 		return True
 
 	except Exception as e:
-		if e.char and e.char == 'T' and address == 1:
+		if e.char and e.char == b'T' and address == 1:
 			raise Exception("Pull-up resistors missing")
 		return False
 
@@ -30,7 +30,6 @@ try:
 
 	serial = adapter.Serial()
 	print("Connected to adapter with serial number: %s" % serial)
-
 	print("Searching I2C devices ...")
 
 	for address in range(1, 128):

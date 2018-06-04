@@ -1,12 +1,12 @@
 import time
 
 USBI2C_error_messages = {
-	'a': "NACK received",
-	'A': "Invalid address",
-	'L': "Invalid length",
-	'C': "Unknown command",
-	'U': "Unknown escape sequence",
-	'T': "Timer expired"
+	b'a': "NACK received",
+	b'A': "Invalid address",
+	b'L': "Invalid length",
+	b'C': "Unknown command",
+	b'U': "Unknown escape sequence",
+	b'T': "Timer expired"
 	}
 
 class AdapterResponseException(Exception):
