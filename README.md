@@ -4,7 +4,9 @@ This repository provides a Python 3 interface between user application and [KEL 
 
 Additionally this repository provides the following examples:
 * I2C search algorithm
-* SHT21 temperature and humidity sensor
+* SHT21 temperature and humidity sensor (GY-21 includes pull-ups)
+* BMP180 temperature and pressure sensor (GY-68 includes pull-ups and VIN = 5V)
+* BH1750 ambient light sensor (GY-302 includes pull-ups, floating ADDR, and VCC = 5V)
 
 ### Windows
 
