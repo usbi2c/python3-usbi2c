@@ -42,6 +42,8 @@ class USBI2C:
 		escaped = 0
 		while len:
 			byte = self.uart.read(1)
+			if byte == b'':
+				raise Exception("Read timeout")
 			if byte == b'\x5c':
 				escaped = 1
 			else:
@@ -56,11 +58,17 @@ class USBI2C:
 		return buf
 
 	def Reset(self):
+		'''
+		This command resets the adapter into defined (reset) state.
+		'''
 		self.uart.write(b'\x1b');
 		if not self.StatusOK():
 			raise Exception("Adapter not ready")
 
 	def Timing(self, speed):
+		'''
+		This command sets the I2C bus frequency and resets into defined state.
+		'''
 		if speed == 10:
 			timing = b'\xc7\xc3\x42\xb0';
 		elif speed == 100:
@@ -76,10 +84,16 @@ class USBI2C:
 		self.uart.write(b'i')
 
 	def Serial(self):
+		'''
+		This command retrieves 96-bit serial number from the adapter.
+		'''
 		self.uart.write(b'n')
 		return self._recv(24).decode()
 
 	def Address(self, address):
+		'''
+		This command sets address of target I2C device.
+		'''
 		if isinstance(address, int):
 			if address < 0 or address > 128:
 				raise Exception('Address out of range')
@@ -92,6 +106,9 @@ class USBI2C:
 		self._send(address)
 
 	def Write(self, data):
+		'''
+		This command writes data into adapter transmit buffer.
+		'''
 		l = len(data)
 		if l < 1 or l > 64:
 			raise Exception('Data length out of range')
@@ -101,12 +118,18 @@ class USBI2C:
 		self._send(data)
 
 	def ReadLength(self, l):
+		'''
+		This commands sets the number of expected bytes from target I2C device.
+		'''
 		if l < 1 or l > 64:
 			raise Exception('Data length out of range')
 		self.uart.write(b'R')
 		self._send(bytes([l]))
 
 	def Read(self, l):
+		'''
+		This commands reads the data from adapter receive buffer.
+		'''
 		self.uart.write(b'r')
 		r = self._recv(l)
 		if (len(r) != l):
@@ -114,14 +137,23 @@ class USBI2C:
 		return r
 
 	def Start(self):
+		'''
+		This command starts the transmission with target I2C device.
+		'''
 		self.uart.write(b'S');
 
 	def Busy(self):
+		'''
+		This command checks if the adapter is busy (transmission takes place).
+		'''
 		self.uart.write(b's');
 		r = self.uart.read(1)
 		return len(r) == 0 or r == b'\xff'
 
 	def StatusOK(self):
+		'''
+		This command checks if an error has occured.
+		'''
 		self.uart.write(b'E');
 		r = self.uart.read(1)
 		if len(r) == 0:
@@ -132,6 +164,9 @@ class USBI2C:
 		return False
 
 	def WaitForCompletion(self):
+		'''
+		Busy-wait loop while transmission takes place.
+		'''
 		elapsedTime = 0
 		while self.Busy():
 			elapsedTime += self.waitInterval
