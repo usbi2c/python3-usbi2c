@@ -77,7 +77,7 @@ class USBI2C:
 
 	def Serial(self):
 		self.uart.write(b'n')
-		return self._recv(8).decode()
+		return self._recv(24).decode()
 
 	def Address(self, address):
 		if isinstance(address, int):
