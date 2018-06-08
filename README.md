@@ -7,6 +7,8 @@ Additionally this repository provides the following examples:
 * SHT21 temperature and humidity sensor (GY-21 includes pull-ups)
 * BMP180 temperature and pressure sensor (GY-68 includes pull-ups and VIN = 5V)
 * BH1750 ambient light sensor (GY-302 includes pull-ups, floating ADDR, and VCC = 5V)
+* AT24C02 eeprom (YL-90 includes pull-ups and VCC = 5V)
+* I2C LCD version 1, address 0x27 (black PCB no text, includes pull-ups and VCC = 5V)
 
 ### Windows
 
