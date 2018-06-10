@@ -21,7 +21,7 @@ class PCF8574:
 		self.background = 0
 		self.opts = 0
 
-	def _send(self, data): 
+	def _send(self, data):
 		self.adapter.Write(bytes([data | self.enable | self.opts, data | self.opts]))
 		self.adapter.Start()
 		self.adapter.WaitForCompletion()
@@ -34,7 +34,7 @@ class PCF8574:
 		self._send((data & 0xF0) | self.rs)
 		self._send(((data << 4) & 0xF0) | self.rs)
 
-	def Clear(self):	
+	def Clear(self):
 		self.SendCommand(0x01)
 		time.sleep(0.001)
 
