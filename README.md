@@ -4,11 +4,12 @@ This repository provides a Python 3 interface between user application and [KEL 
 
 Additionally this repository provides the following examples:
 * I2C search algorithm
-* SHT21 temperature and humidity sensor (GY-21 includes pull-ups)
-* BMP180 temperature and pressure sensor (GY-68 includes pull-ups and VIN = 5V)
-* BH1750 ambient light sensor (GY-302 includes pull-ups, floating ADDR, and VCC = 5V)
-* AT24C02 eeprom (YL-90 includes pull-ups and VCC = 5V)
-* I2C LCD version 1, address 0x27 (black PCB no text, includes pull-ups and VCC = 5V)
+* SHT21 temperature and humidity sensor (GY-21 includes 10k pull-ups)
+* BMP180 temperature and pressure sensor (GY-68 includes 4k7 pull-ups and VIN = 5V)
+* BH1750 ambient light sensor (GY-302 includes 10k pull-ups, floating ADDR, and VCC = 5V)
+* AT24C02 EEPROM (YL-90 includes 10k pull-ups and VCC = 5V)
+* PCF8574 (I2C LCD version 1), address 0x27 (black PCB no text, includes 4k7 pull-ups and VCC = 5V)
+* ADS1115 16-bit ADC, address 0x48 (includes 10k pull-ups, ADDR = GND, VDD = 5V)
 
 ### Windows
 
