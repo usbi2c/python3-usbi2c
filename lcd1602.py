@@ -10,6 +10,13 @@ class LCD1602:
 		self.address = 0x27
 		self.adapter = adapter
 
+		'''
+		This example works for I2C LCD version 1, black PCB, with words: POWER, A0, A1 and A2.
+
+		PCF8574T connections:
+		addr, en,rw,rs,d4,d5,d6,d7,bl,blpol
+		0x27,  2, 1, 0, 4, 5, 6, 7, 3, POSITIVE
+		'''
 		self.rs = 0x01
 		self.rw = 0x02
 		self.enable = 0x04
@@ -31,27 +38,41 @@ class LCD1602:
 		self._send((data & 0xF0) | self.rs)
 		self._send(((data << 4) & 0xF0) | self.rs)
 
+	def Clean(self):
+		self.SendCommand(0x01)
+		time.sleep(0.001)
+
+	def Configure(self):
+		# LCD 2LINE
+		self.SendCommand(0x28)
+
+		# LCD ENTRY
+		self.SendCommand(0x06)
+
+	def SetCursor(self, config = 0):
+		'''
+		0 - nothing
+		1 - blinking box
+		2 - underline
+		'''
+		self.SendCommand(0x0C | (config & 0x03))
+
 	def InitLCD(self):
 		self.adapter.Reset()
 		self.adapter.Address(self.address)
+
+		# LCD RESET
 		self._send(0x30)
 		time.sleep(0.01)
 		self._send(0x30)
 		self._send(0x30)
+
+		# LCD 4-lines
 		self._send(0x20)
 
-		# 2LINE
-		self.SendCommand(0x28)
-
-		# CLEAN
-		self.SendCommand(0x01)
-		time.sleep(0.001)
-
-		# ENTRY
-		self.SendCommand(0x06)
-
-		# CURSOR
-		self.SendCommand(0x0F)
+		self.Configure()
+		self.Clean()
+		self.SetCursor()
 
 	def SendText(self, text):
 		for i in text:
@@ -78,6 +99,8 @@ try:
 
 	lcd.gotoXY(2, 1)
 	lcd.SendText("USB-I2C")
+
+	lcd.SetCursor(1)
 
 except Exception as e:
 	print(e)
