@@ -39,5 +39,7 @@ try:
 
 	print("L = %d lx" % (bh1750.getLuminosity()))
 
+	uart.close()
+
 except Exception as e:
 	print(e)

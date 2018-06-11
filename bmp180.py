@@ -109,5 +109,7 @@ try:
 	print("P = %.4f mBar" % (P / 10**5))
 	print("A = %d m" % (bmp180.getAltitude(P)));
 
+	uart.close()
+
 except Exception as e:
 	print(e)

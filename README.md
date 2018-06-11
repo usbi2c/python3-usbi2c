@@ -15,6 +15,8 @@ Additionally this repository provides the following examples:
 
 A `pyserial` package is needed for Python 3 on Windows. The package could be installed by executing `pip install pyserial` on Windows command line.
 
+In examples string `/dev/ttyACM0` must be changed to reflect COM port where USB-I2C interface is attached to. Look at Device Manager.
+
 ### Debian, Ubuntu
 
 On Debian based operating system a `python3-serial` package is needed.

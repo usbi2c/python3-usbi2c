@@ -36,6 +36,8 @@ try:
 		if probe(adapter, address):
 			print("0x%x (%d)" % (address, address))
 
+	uart.close()
+
 except Exception as e:
 	print(e)
 

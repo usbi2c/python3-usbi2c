@@ -21,5 +21,7 @@ try:
 
 	lcd.SetCursor(1)
 
+	uart.close()
+
 except Exception as e:
 	print(e)

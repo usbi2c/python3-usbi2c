@@ -85,5 +85,7 @@ try:
 	r = at24c02.Read(length).decode()
 	print("Reading: %s" % (r))
 
+	uart.close()
+
 except Exception as e:
 	print(e)

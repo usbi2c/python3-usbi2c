@@ -78,5 +78,7 @@ try:
 		ads1115.WaitForCompletion()
 		print("U%d = %.3f V" % (i, ads1115.Voltage()))
 
+	uart.close()
+
 except Exception as e:
 	print(e)
