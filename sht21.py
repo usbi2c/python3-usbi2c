@@ -17,22 +17,25 @@ def TransformHumidity(r):
 class SHT21:
 
 	def __init__(self, adapter):
+		self.address = 0x40
 		self.adapter = adapter
 
 	def Read(self, command):
 		self.adapter.Reset()
+		self.adapter.Address(self.address)
 
-		self.adapter.Address(b'\x40')
+		# This will write a command (one byte) to SHT21 with clock stretching.
 		self.adapter.Write(command)
 		self.adapter.Start()
-
 		self.adapter.WaitForCompletion()
 
+		# This will request 3 bytes from SHT21.
 		self.adapter.ReadLength(3)
 		self.adapter.Start()
-
+		# Any bytes less will result in NACK.
 		self.adapter.WaitForCompletion()
 
+		# Read received bytes from interface.
 		return self.adapter.Read(3)
 
 	def Temperature(self):
