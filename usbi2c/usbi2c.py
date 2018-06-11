@@ -61,7 +61,9 @@ class USBI2C:
 		'''
 		This command resets the adapter into defined (reset) state.
 		'''
-		self.uart.write(b'\x1b');
+		self.uart.flushInput()
+		self.uart.flushOutput()
+		self.uart.write(b'\x1b')
 		if not self.StatusOK():
 			raise Exception("Adapter not ready")
 
