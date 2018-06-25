@@ -21,18 +21,31 @@ class PCF8574:
 		self.background = 0
 		self.opts = 0
 
-	def _send(self, data):
+	def _send_byte(self, data):
 		self.adapter.Write(bytes([data | self.enable | self.opts, data | self.opts]))
 		self.adapter.Start()
 		self.adapter.WaitForCompletion()
 
+	def _send_bytes(self, data):
+		buf = []
+		for byte in data:
+			buf += [byte | self.enable | self.opts]
+			buf += [byte | self.opts]
+		k = 0
+		length = len(buf)
+		while length:
+			l = 64 if length > 64 else length
+			self.adapter.Write(bytes(buf[k:k+l]))
+			self.adapter.Start()
+			self.adapter.WaitForCompletion()
+			length -= l
+			k += l
+
 	def SendCommand(self, data):
-		self._send((data & 0xF0))
-		self._send(((data << 4) & 0xF0))
+		self._send_bytes([data & 0xF0, (data << 4) & 0xF0])
 
 	def SendChar(self, data):
-		self._send((data & 0xF0) | self.rs)
-		self._send(((data << 4) & 0xF0) | self.rs)
+		self._send_bytes([(data & 0xF0) | self.rs, ((data << 4) & 0xF0) | self.rs])
 
 	def Clear(self):
 		self.SendCommand(0x01)
@@ -58,26 +71,29 @@ class PCF8574:
 		self.adapter.Address(self.address)
 
 		# LCD RESET
-		self._send(0x30)
+		self._send_byte(0x30)
 		time.sleep(0.01)
-		self._send(0x30)
-		self._send(0x30)
+		self._send_byte(0x30)
+		self._send_byte(0x30)
 
 		# LCD 4-lines
-		self._send(0x20)
+		self._send_byte(0x20)
 
 		self.Configure()
 		self.Clear()
 		self.SetCursor()
 
 	def SendText(self, text):
+		buf = []
 		for i in text:
-			self.SendChar(ord(i))
+			buf += [(ord(i) & 0xF0) | self.rs]
+			buf += [((ord(i) << 4) & 0xF0) | self.rs]
+		self._send_bytes(buf)
 
 	def Background(self, state):
 		self.background = state
 		self.opts = self.bg if self.background else 0
-		self._send(self.enable)
+		self._send_byte(self.enable)
 
 	def gotoXY(self, x, y):
 		self.SendCommand(x + (0x80 | (0x40 if y == 1 else 0)))
