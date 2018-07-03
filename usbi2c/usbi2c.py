@@ -72,7 +72,7 @@ class USBI2C:
 		This command sets the I2C bus frequency and resets into defined state.
 		'''
 		if speed == 10:
-			timing = b'\xc7\xc3\x42\xb0';
+			timing = b'\xc7\xc3\x42\xb0'
 		elif speed == 100:
 			timing = b'\x13\x0f\x42\xb0'
 		elif speed == 400:
