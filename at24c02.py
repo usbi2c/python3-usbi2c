@@ -72,7 +72,7 @@ class AT24C02:
 
 try:
 	print("24C02 I2C EEPROM demo application")
-	uart = serial.Serial('/dev/ttyACM0', timeout = 1);
+	uart = serial.Serial('/dev/ttyACM0', timeout = 1)
 
 	adapter = USBI2C(uart)
 	at24c02 = AT24C02(adapter)

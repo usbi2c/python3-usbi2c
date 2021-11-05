@@ -48,7 +48,7 @@ class SHT21:
 
 print("SHT21 demo application")
 try:
-	uart = serial.Serial('/dev/ttyACM0', timeout = 1);
+	uart = serial.Serial('/dev/ttyACM0', timeout = 1)
 
 	adapter = USBI2C(uart)
 	sht21 = SHT21(adapter)

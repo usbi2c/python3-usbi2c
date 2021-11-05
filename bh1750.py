@@ -32,7 +32,7 @@ class BH1750:
 
 try:
 	print("BH1750 demo application")
-	uart = serial.Serial('/dev/ttyACM0', timeout = 1);
+	uart = serial.Serial('/dev/ttyACM0', timeout = 1)
 
 	adapter = USBI2C(uart)
 	bh1750 = BH1750(adapter)

@@ -92,7 +92,7 @@ class BMP180:
 
 try:
 	print("BMP180 demo application")
-	uart = serial.Serial('/dev/ttyACM0', timeout = 1);
+	uart = serial.Serial('/dev/ttyACM0', timeout = 1)
 
 	adapter = USBI2C(uart)
 	bmp180 = BMP180(adapter)
@@ -107,7 +107,7 @@ try:
 	print("Obtaining pressure ...")
 	P = bmp180.getPressure(bmp180.preprarePressure())
 	print("P = %.4f mBar" % (P / 10**5))
-	print("A = %d m" % (bmp180.getAltitude(P)));
+	print("A = %d m" % (bmp180.getAltitude(P)))
 
 	uart.close()
 

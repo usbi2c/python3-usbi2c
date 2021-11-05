@@ -67,7 +67,7 @@ class ADS1115:
 
 try:
 	print("ADS1115 demo application")
-	uart = serial.Serial('/dev/ttyACM0', timeout = 1);
+	uart = serial.Serial('/dev/ttyACM0', timeout = 1)
 
 	adapter = USBI2C(uart)
 	ads1115 = ADS1115(adapter)

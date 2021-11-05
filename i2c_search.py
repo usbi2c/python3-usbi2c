@@ -4,6 +4,8 @@ import serial
 from sys import platform
 from usbi2c.usbi2c import *
 
+verbose = False
+
 def probe(adapter, address):
 	try:
 		adapter.Address(address)
@@ -23,18 +25,26 @@ def serial_name():
 		return "COM4"
 
 try:
-	uart = serial.Serial(serial_name(), timeout = 1);
+	name = serial_name()
+	if verbose:
+		print ("Using serial port: %s" % name)
+	uart = serial.Serial(name, timeout = 1)
 
 	adapter = USBI2C(uart)
 	adapter.Reset()
 
 	serial = adapter.Serial()
 	print("Connected to adapter with serial number: %s" % serial)
-	print("Searching I2C devices ...")
+	print("Scanning for I2C devices ...")
 
 	for address in range(1, 128):
-		if probe(adapter, address):
-			print("0x%x (%d)" % (address, address))
+		detected = probe(adapter, address)
+		result = "found" if detected else "not found"
+		if verbose:
+			print("Probing address %x ... %s" % (address, result))
+		elif detected:
+			print ("%s on 0x%x (%d)" %
+				(result.capitalize(), address, address))
 
 	uart.close()
 
@@ -42,4 +52,4 @@ except Exception as e:
 	print(e)
 
 finally:
-	print("Finished")
+	print("Finished scanning")

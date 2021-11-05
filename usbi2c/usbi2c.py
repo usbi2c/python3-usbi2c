@@ -17,12 +17,12 @@ class AdapterResponseException(Exception):
 	def __str__(self):
 		if self.char in USBI2C_error_messages:
 			return USBI2C_error_messages[self.char]
-		return "Unknown response"
+		return "Unknown response: %s" % self.char
 
 class USBI2C:
 
 	def __init__(self, uart):
-		self.waitInterval = 0.02
+		self.waitInterval = 0.002
 		self.wait = 1.5
 		self.uart = uart
 
@@ -59,7 +59,7 @@ class USBI2C:
 
 	def Reset(self):
 		'''
-		This command resets the adapter into defined (reset) state.
+		Reset the adapter into defined (reset) state.
 		'''
 		self.uart.flushInput()
 		self.uart.flushOutput()
@@ -69,7 +69,7 @@ class USBI2C:
 
 	def Timing(self, speed):
 		'''
-		This command sets the I2C bus frequency and resets into defined state.
+		Set the I2C bus frequency and resets into defined state.
 		'''
 		if speed == 10:
 			timing = b'\xc7\xc3\x42\xb0'
@@ -87,14 +87,14 @@ class USBI2C:
 
 	def Serial(self):
 		'''
-		This command retrieves 96-bit serial number from the adapter.
+		Retrieve 96-bit serial number from the adapter.
 		'''
 		self.uart.write(b'n')
 		return self._recv(24).decode()
 
 	def Address(self, address):
 		'''
-		This command sets address of target I2C device.
+		Set address of target I2C device.
 		'''
 		if isinstance(address, int):
 			if address < 0 or address > 128:
@@ -109,19 +109,21 @@ class USBI2C:
 
 	def Write(self, data):
 		'''
-		This command writes data into adapter transmit buffer.
+		Write data into adapter transmit buffer.
 		'''
+		if isinstance(data, int):
+			data = [data]
 		l = len(data)
 		if l < 1 or l > 64:
 			raise Exception('Data length out of range')
 		self.uart.write(b'W')
-		self._send(bytes([l]));
+		self._send(bytes([l]))
 		self.uart.write(b'w')
 		self._send(data)
 
 	def ReadLength(self, l):
 		'''
-		This commands sets the number of expected bytes from target I2C device.
+		Set the number of expected bytes from target I2C device.
 		'''
 		if l < 1 or l > 64:
 			raise Exception('Data length out of range')
@@ -130,7 +132,7 @@ class USBI2C:
 
 	def Read(self, l):
 		'''
-		This commands reads the data from adapter receive buffer.
+		Read the data from adapter receive buffer.
 		'''
 		self.uart.write(b'r')
 		r = self._recv(l)
@@ -140,23 +142,31 @@ class USBI2C:
 
 	def Start(self):
 		'''
-		This command starts the transmission with target I2C device.
+		Start the transmission with target I2C device.
 		'''
-		self.uart.write(b'S');
+		self.uart.write(b'S')
 
 	def Busy(self):
 		'''
-		This command checks if the adapter is busy (transmission takes place).
+		Check if the adapter is busy (transmission takes place).
 		'''
-		self.uart.write(b's');
-		r = self.uart.read(1)
-		return len(r) == 0 or r == b'\xff'
+		busy = True
+
+		self.uart.write(b's')
+		while True:
+			r = self.uart.read(1)
+			if r == b'\x1b' or r == b'\x00':
+				busy = False
+			if self.uart.in_waiting == 0:
+				break
+
+		return busy
 
 	def StatusOK(self):
 		'''
-		This command checks if an error has occured.
+		Check if an error has occured.
 		'''
-		self.uart.write(b'E');
+		self.uart.write(b'E')
 		r = self.uart.read(1)
 		if len(r) == 0:
 			raise Exception("Communication error")
