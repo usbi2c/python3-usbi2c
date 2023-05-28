@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import serial
+from argparse import ArgumentParser
 from sys import platform
 from usbi2c.usbi2c import *
 
@@ -18,23 +19,18 @@ def probe(adapter, address):
 			raise Exception("Pull-up resistors missing")
 		return False
 
-def serial_name():
+def serial_port():
 	if platform == "linux":
 		return "/dev/ttyACM0"
 	else:
 		return "COM4"
 
-try:
-	name = serial_name()
-	if verbose:
-		print ("Using serial port: %s" % name)
-	uart = serial.Serial(name, timeout = 1)
-
+def search(uart):
 	adapter = USBI2C(uart)
 	adapter.Reset()
 
-	serial = adapter.Serial()
-	print("Connected to adapter with serial number: %s" % serial)
+	serial_number = adapter.Serial()
+	print("Connected to adapter with serial number: %s" % serial_number)
 	print("Scanning for I2C devices ...")
 
 	for address in range(1, 128):
@@ -46,7 +42,21 @@ try:
 			print ("%s on 0x%x (%d)" %
 				(result.capitalize(), address, address))
 
-	uart.close()
+parser = ArgumentParser(description="")
+parser.add_argument('--port',
+	help="serial port name",
+)
+
+args = parser.parse_args()
+port = serial_port() if args.port is None else args.port
+
+try:
+	if verbose:
+		print("Using serial port: %s" % port)
+	uart = serial.Serial(port, timeout = 1)
+	if uart:
+		search(uart)
+		uart.close()
 
 except Exception as e:
 	print(e)

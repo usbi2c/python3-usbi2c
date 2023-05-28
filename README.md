@@ -1,6 +1,6 @@
 # USB–I2C (USB to I²C) interface (adapter module)
 
-This repository provides a Python 3 interface between user application and [KEL USB-I2C interface](http://kel.si/) protocol. See files inside `usbi2c` directory.
+This repository provides a Python 3 interface between user application and [KEL USB-I2C interface](https://kel.si/) protocol. See files inside `usbi2c` directory.
 
 Additionally this repository provides the following examples:
 * I2C search algorithm
@@ -10,12 +10,13 @@ Additionally this repository provides the following examples:
 * BMP180 temperature and pressure sensor, address 0x77 (GY-68 includes 4k7 pull-ups and VIN = 5V)
 * PCF8574 (I2C LCD version 1), address 0x27 (black PCB no text, includes 4k7 pull-ups and VCC = 5V)
 * SHT21 temperature and humidity sensor, address 0x40 (GY-21 includes 10k pull-ups)
+* SHT3X temperature and humidity sensor, address 0x44
 
 ### Windows
 
 A `pyserial` package is needed for Python 3 on Windows. The package could be installed by executing `pip install pyserial` on Windows command line.
 
-In examples, string `/dev/ttyACM0` must be changed to reflect COM port where USB-I2C interface is attached to. Look at Device Manager.
+In examples, string `/dev/ttyACM0` must be changed to reflect serial (COM) port where USB-I2C interface is attached to. Look at Device Manager.
 
 ### Debian, Ubuntu
 
