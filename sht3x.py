@@ -2,16 +2,9 @@
 
 import serial
 import struct
+import sys
 from argparse import ArgumentParser
 from usbi2c import USBI2C
-
-def TransformTemperature(r):
-	val = struct.unpack('>H', r)[0]
-	return -45 + 175.0 * val / 2**16
-
-def TransformHumidity(r):
-	val = struct.unpack('>H', r)[0]
-	return 100.0 * val / 2**16
 
 def CRC8(data):
 	crc = 0xff
@@ -31,6 +24,7 @@ class SHT3X:
 	def __init__(self, adapter):
 		self.address = 0x44
 		self.adapter = adapter
+		self.response = None
 
 	def Read(self, command):
 		self.adapter.Reset()
@@ -48,10 +42,29 @@ class SHT3X:
 		self.adapter.WaitForCompletion()
 
 		# Read received bytes from interface
-		return self.adapter.Read(6)
+		self.response = self.adapter.Read(6)
+		return self.response
 
 	def CRC(self, data):
 		return CRC8(data)
+
+	def TransformTemperature(self, r):
+		val = struct.unpack('>H', r)[0]
+		return -45 + 175.0 * val / (2**16 - 1)
+
+	def TransformHumidity(self, r):
+		val = struct.unpack('>H', r)[0]
+		return 100.0 * val / (2**16 - 1)
+
+	def Temperature(self):
+		if self.response and self.CRC(self.response[0:3]) == 0:
+			return self.TransformTemperature(self.response[0:2])
+		return None
+
+	def Humidity(self):
+		if self.response and self.CRC(self.response[3:6]) == 0:
+			return self.TransformHumidity(self.response[3:5])
+		return None
 
 
 def measure(uart):
@@ -59,33 +72,30 @@ def measure(uart):
 	sht3x = SHT3X(adapter)
 
 	resp = sht3x.Read(b"\x2c\x06")
-
-	t = (
-		None if sht3x.CRC(resp[0:3]) else
-		TransformTemperature(resp[0:2])
-	)
-	h = (
-		None if sht3x.CRC(resp[3:6]) else
-		TransformHumidity(resp[3:5])
-	)
+	t = sht3x.Temperature()
+	h = sht3x.Humidity()
 
 	if h and t:
 		print("T = %.3f °C\nH = %.2f %%" % (t, h))
 
-print("SHT3X demo application")
+def main():
+	print("SHT3X demo application")
 
-parser = ArgumentParser(description="")
-parser.add_argument('--port',
-	help="serial port name",
-)
+	parser = ArgumentParser(description="")
+	parser.add_argument('--port',
+		help="serial port name",
+	)
 
-args = parser.parse_args()
-port = "/dev/ttyACM0" if args.port is None else args.port
+	args = parser.parse_args()
+	port = "/dev/ttyACM0" if args.port is None else args.port
 
-try:
-	uart = serial.Serial(port, timeout = 1)
-	measure(uart)
-	uart.close()
+	try:
+		uart = serial.Serial(port, timeout = 1)
+		measure(uart)
+		uart.close()
 
-except Exception as e:
-	print(e)
+	except Exception as e:
+		print(e, file=sys.stderr)
+
+if __name__ == "__main__":
+	main()

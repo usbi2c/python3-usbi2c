@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import serial
+import sys
 from argparse import ArgumentParser
-from sys import platform
 from usbi2c.usbi2c import *
 
 verbose = False
@@ -20,7 +20,7 @@ def probe(adapter, address):
 		return False
 
 def serial_port():
-	if platform == "linux":
+	if sys.platform == "linux":
 		return "/dev/ttyACM0"
 	else:
 		return "COM4"
@@ -59,7 +59,7 @@ try:
 		uart.close()
 
 except Exception as e:
-	print(e)
+	print(e, file=sys.stderr)
 
 finally:
 	print("Finished scanning")
